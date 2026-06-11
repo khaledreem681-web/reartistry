@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#0A0A0F"/>
+<title>reArtistry</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --red:#E3192A;--red2:#B5101E;--redg:rgba(227,25,42,0.15);
+  --cyan:#00C8D7;--cyan2:#009CAA;--cyang:rgba(0,200,215,0.12);
+  --bg:#0A0A0F;--bg2:#12121A;--bg3:#1A1A26;--card:#15151E;
+  --border:rgba(255,255,255,0.07);--text:#F0F0F5;--muted:#8888A0;--dim:#55556A;
+  --gold:#D4AF37;
+}
+body{font-family:'Inter','Tajawal',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body.ar{font-family:'Tajawal','Inter',sans-serif;direction:rtl}
+::-webkit-scrollbar{width:0}
+
+/* SPLASH */
+#splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .5s,transform .5s}
+#splash.out{opacity:0;transform:scale(1.05);pointer-events:none}
+.s-logo{font-size:2.6rem;font-weight:800;background:linear-gradient(135deg,var(--red),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:'Inter',sans-serif}
+.s-sub{color:var(--muted);font-size:.8rem;letter-spacing:4px;text-transform:uppercase;margin-top:4px}
+.s-bar{width:100px;height:2px;background:var(--bg3);border-radius:2px;margin-top:32px;overflow:hidden}
+.s-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--cyan));animation:fill 1.5s ease forwards}
+@keyframes fill{from{width:0}to{width:100%}}
+
+/* APP */
+#app{display:none;flex-direction:column;min-height:100vh}
+#app.on{display:flex}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(10,10,15,.93);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.logo{font-size:1.35rem;font-weight:800;background:linear-gradient(135deg,var(--red),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:'Inter',sans-serif;flex-shrink:0}
+.top-right{display:flex;align-items:center;gap:7px}
+.lang-wrap{display:flex;background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:3px;overflow:hidden}
+.lb{padding:4px 9px;border-radius:14px;border:none;background:transparent;color:var(--muted);font-size:.72rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:'Inter',sans-serif}
+.lb.on{background:linear-gradient(135deg,var(--red),var(--red2));color:#fff}
+.icon-btn{width:34px;height:34px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:.8rem;font-weight:700;transition:all .2s}
+
+/* SEARCH */
+.search-bar{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--bg);padding:12px 14px;border-bottom:1px solid var(--border);display:none;align-items:center;gap:9px;animation:sdown .2s ease}
+.search-bar.on{display:flex}
+@keyframes sdown{from{transform:translateY(-100%)}to{transform:translateY(0)}}
+.s-input{flex:1;background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:9px 13px;color:var(--text);font-family:inherit;font-size:.9rem;outline:none}
+.s-input:focus{border-color:var(--cyan)}
+.s-close{background:none;border:none;color:var(--muted);font-size:.9rem;cursor:pointer;padding:4px;font-weight:700}
+
+/* TABS */
+.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:57px;z-index:90}
+.tab{flex:1;padding:12px 6px;background:none;border:none;color:var(--muted);font-family:inherit;font-size:.85rem;font-weight:600;cursor:pointer;position:relative;transition:color .2s}
+.tab.on{color:var(--text)}
+.tab::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:2px;border-radius:2px 2px 0 0;background:linear-gradient(90deg,var(--red),var(--cyan));opacity:0;transition:opacity .2s}
+.tab.on::after{opacity:1}
+
+/* MAIN */
+.main{flex:1;padding-bottom:16px}
+.page{display:none}
+.page.on{display:block}
+
+/* HERO */
+.hero{margin:12px 12px 0;border-radius:16px;overflow:hidden;position:relative;height:180px;background:linear-gradient(135deg,#1a0a0e,#0a1a1e)}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(circle at 20% 50%,var(--redg),transparent 60%),radial-gradient(circle at 80% 50%,var(--cyang),transparent 60%)}
+.hero-grid{position:absolute;inset:0;opacity:.05;background-image:linear-gradient(var(--text) 1px,transparent 1px),linear-gradient(90deg,var(--text) 1px,transparent 1px);background-size:28px 28px}
+.hero-body{position:relative;z-index:2;padding:22px 18px;height:100%;display:flex;flex-direction:column;justify-content:space-between}
+.hero-tag{display:inline-block;background:rgba(227,25,42,.18);border:1px solid rgba(227,25,42,.3);border-radius:20px;padding:3px 11px;font-size:.68rem;color:var(--red);letter-spacing:1px;text-transform:uppercase;width:fit-content}
+.hero-title{font-size:1.5rem;font-weight:800;line-height:1.2}
+.hero-title span{color:var(--cyan)}
+.hero-sub{color:var(--muted);font-size:.78rem;margin-top:3px}
+
+/* SECTION */
+.sec-head{display:flex;align-items:center;justify-content:space-between;padding:16px 12px 9px}
+.sec-title{font-size:1rem;font-weight:700}
+.sec-title span{color:var(--red)}
+.sec-count{font-size:.72rem;color:var(--muted);background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:2px 9px}
+
+/* CHIPS */
+.chips{display:flex;gap:6px;padding:0 12px 9px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;padding:5px 13px;border-radius:20px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);font-family:inherit;font-size:.78rem;cursor:pointer;transition:all .2s;white-space:nowrap}
+.chip.on{background:linear-gradient(135deg,var(--red),var(--red2));border-color:transparent;color:#fff}
+
+/* ART GRID */
+.art-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:0 12px}
+.art-card{background:var(--card);border-radius:13px;border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:transform .2s;position:relative}
+.art-card:active{transform:scale(.97)}
+.art-img-wrap{position:relative;overflow:hidden;height:145px}
+.art-card.feat{grid-column:span 2;display:grid;grid-template-columns:1.2fr 1fr}
+.art-card.feat .art-img-wrap{height:185px}
+.art-img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.art-card:hover .art-img{transform:scale(1.04)}
+.abadge{position:absolute;top:7px;right:7px;background:var(--red);color:#fff;font-size:.6rem;font-weight:700;padding:2px 7px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px}
+.abadge.new{background:var(--cyan);color:var(--bg)}
+.abadge.sold{background:#444}
+.art-info{padding:9px}
+.art-name{font-size:.8rem;font-weight:700;margin-bottom:1px;line-height:1.3}
+.art-name2{font-size:.68rem;color:var(--muted);font-style:italic}
+.art-artist{font-size:.7rem;color:var(--muted);margin-bottom:6px}
+.art-foot{display:flex;align-items:center;justify-content:space-between}
+.art-price{font-size:.85rem;font-weight:800;color:var(--cyan)}
+.art-price.sold{color:var(--dim);text-decoration:line-through}
+.mini-btn{background:var(--red);color:#fff;border:none;border-radius:7px;padding:4px 9px;font-family:inherit;font-size:.7rem;font-weight:700;cursor:pointer;transition:background .2s;flex-shrink:0}
+.mini-btn:active{background:var(--red2)}
+.card-actions{position:absolute;top:7px;left:7px;display:flex;gap:4px;z-index:5}
+.ca-btn{width:26px;height:26px;border-radius:50%;border:none;color:#fff;font-size:.72rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700}
+.ca-del{background:rgba(0,0,0,.7)}
+.ca-edit{background:rgba(0,200,215,.85)}
+.ubadge{display:inline-block;background:var(--cyang);border:1px solid rgba(0,200,215,.2);color:var(--cyan);border-radius:20px;padding:1px 6px;font-size:.58rem;font-weight:700;margin-right:3px}
+
+/* BOOKS */
+.books-list{display:flex;flex-direction:column;gap:9px;padding:0 12px}
+.book-card{background:var(--card);border-radius:13px;border:1px solid var(--border);overflow:hidden;display:flex;cursor:pointer;transition:transform .2s;position:relative}
+.book-card:active{transform:scale(.98)}
+.book-cover-wrap{width:95px;flex-shrink:0;position:relative;overflow:hidden}
+.book-cover{width:100%;height:100%;object-fit:cover;min-height:125px}
+.bbadge{position:absolute;bottom:6px;right:6px;background:var(--cyan);color:var(--bg);font-size:.6rem;font-weight:800;padding:2px 6px;border-radius:5px;text-transform:uppercase}
+.book-info{padding:11px;flex:1;display:flex;flex-direction:column;justify-content:space-between}
+.book-title{font-size:.88rem;font-weight:700;line-height:1.3;margin-bottom:1px}
+.book-title2{font-size:.72rem;color:var(--muted);font-style:italic;margin-bottom:2px}
+.book-author{font-size:.75rem;color:var(--muted);margin-bottom:4px}
+.book-desc{font-size:.73rem;color:var(--muted);line-height:1.5;flex:1}
+.book-foot{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.book-price{font-size:.92rem;font-weight:800;color:var(--cyan)}
+.stars{color:var(--gold);font-size:.7rem}
+.book-actions{position:absolute;top:7px;right:7px;display:flex;gap:4px;z-index:5}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:none;align-items:flex-end}
+.modal-bg.on{display:flex}
+.modal-sheet{background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-height:88vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,20px);animation:sup .3s cubic-bezier(.34,1.56,.64,1)}
+@keyframes sup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:34px;height:3px;background:var(--bg3);border-radius:2px;margin:10px auto 0}
+.modal-img-wrap{position:relative}
+.modal-img{width:100%;height:250px;object-fit:cover;cursor:pointer}
+.modal-close{position:absolute;top:12px;left:12px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.6);border:none;color:#fff;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;z-index:10}
+.modal-dots{position:absolute;bottom:9px;left:50%;transform:translateX(-50%);display:flex;gap:4px}
+.modal-body{padding:16px}
+.modal-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px}
+.mtag{padding:3px 9px;border-radius:20px;font-size:.68rem;font-weight:600}
+.mtag.type{background:var(--redg);color:var(--red);border:1px solid rgba(227,25,42,.2)}
+.mtag.cat{background:var(--cyang);color:var(--cyan);border:1px solid rgba(0,200,215,.2)}
+.modal-title{font-size:1.25rem;font-weight:800;margin-bottom:1px}
+.modal-title2{font-size:.85rem;color:var(--muted);font-style:italic;margin-bottom:2px}
+.modal-sub{color:var(--muted);font-size:.82rem;margin-bottom:12px}
+.modal-desc{color:var(--muted);font-size:.85rem;line-height:1.7;margin-bottom:6px}
+.modal-desc2{color:var(--dim);font-size:.78rem;line-height:1.6;font-style:italic;margin-bottom:14px}
+.specs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:14px}
+.spec{background:var(--bg3);border-radius:9px;padding:8px 10px;border:1px solid var(--border)}
+.spec-label{font-size:.65rem;color:var(--dim);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
+.spec-val{font-size:.82rem;font-weight:600}
+.price-row{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border-radius:13px;padding:13px;border:1px solid var(--border);margin-bottom:12px}
+.price-label{font-size:.72rem;color:var(--muted)}
+.price-big{font-size:1.45rem;font-weight:800;color:var(--cyan)}
+.btn-main{width:100%;padding:14px;border:none;border-radius:13px;font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .2s;margin-bottom:8px}
+.btn-red{background:linear-gradient(135deg,var(--red),var(--red2));color:#fff}
+.btn-red:active{opacity:.85}
+.btn-cyan{background:transparent;color:var(--cyan);border:1.5px solid var(--cyan)}
+.btn-cyan:active{background:var(--cyang)}
+.btn-green{background:linear-gradient(135deg,#25D366,#075E54);color:#fff}
+.btn-insta{background:linear-gradient(135deg,#E1306C,#833AB4);color:#fff}
+.seller-box{background:var(--bg3);border-radius:13px;padding:13px;border:1px solid var(--border);margin-bottom:12px}
+.seller-label{font-size:.68rem;color:var(--cyan);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px}
+
+/* CONTACT PAGE */
+.contact-page{padding:18px 12px}
+.cp-title{font-size:1.5rem;font-weight:800;background:linear-gradient(135deg,var(--red),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-family:'Inter',sans-serif;margin-bottom:3px}
+.cp-sub{color:var(--muted);font-size:.82rem;margin-bottom:18px}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.stat{background:var(--card);border-radius:11px;padding:12px 8px;border:1px solid var(--border);text-align:center}
+.stat-n{font-size:1.3rem;font-weight:800;color:var(--cyan)}
+.stat-l{font-size:.65rem;color:var(--muted);margin-top:2px}
+.ccard{background:var(--card);border-radius:16px;border:1px solid var(--border);overflow:hidden;margin-bottom:13px}
+.citem{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s}
+.citem:last-child{border-bottom:none}
+.citem:active{background:var(--bg3)}
+.cicon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;color:#fff;font-weight:800}
+.ci-r{background:linear-gradient(135deg,var(--red),var(--red2))}
+.ci-w{background:linear-gradient(135deg,#25D366,#075E54)}
+.ci-i{background:linear-gradient(135deg,#E1306C,#833AB4)}
+.ctext{flex:1}
+.clabel{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px}
+.cval{font-size:.9rem;font-weight:600}
+.cchev{color:var(--dim);font-size:.8rem;font-weight:700}
+.pwa-box{background:var(--bg3);border-radius:13px;padding:13px;border:1px solid rgba(0,200,215,.15)}
+.pwa-t{font-weight:700;font-size:.85rem;margin-bottom:3px}
+.pwa-d{font-size:.73rem;color:var(--muted);line-height:1.5}
+
+/* BOTTOM NAV */
+.nav{position:sticky;bottom:0;background:rgba(10,10,15,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;padding-bottom:env(safe-area-inset-bottom,0)}
+.nb{flex:1;padding:8px 6px;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--dim);transition:color .2s;font-family:inherit}
+.nb.on{color:var(--red)}
+.nb-icon{font-size:.9rem;font-weight:800}
+.nb-label{font-size:.6rem}
+.nb-dot{width:3px;height:3px;border-radius:50%;background:var(--red);opacity:0;transition:opacity .2s}
+.nb.on .nb-dot{opacity:1}
+
+/* FAB */
+.fab{position:fixed;bottom:80px;left:16px;z-index:300;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--red),var(--cyan));border:none;color:#fff;font-size:1.5rem;font-weight:300;box-shadow:0 4px 18px rgba(227,25,42,.35);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.fab:active{transform:scale(.9)}
+
+/* ADD/EDIT FORM */
+.form-bg{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.8);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:none;align-items:flex-end}
+.form-bg.on{display:flex}
+.form-sheet{background:var(--bg2);border-radius:20px 20px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,20px);animation:sup .3s cubic-bezier(.34,1.56,.64,1)}
+.form-head{position:sticky;top:0;background:var(--bg2);padding:13px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;z-index:10}
+.form-title{font-size:.95rem;font-weight:800}
+.form-close{width:30px;height:30px;border-radius:50%;background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700}
+.form-body{padding:16px}
+.type-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:16px}
+.type-btn{padding:10px;border-radius:11px;border:1.5px solid var(--border);background:var(--bg3);color:var(--muted);font-family:inherit;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
+.type-btn.on{border-color:var(--red);background:var(--redg);color:var(--text)}
+.fgroup{margin-bottom:11px}
+.flabel{display:block;font-size:.72rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.flabel span{color:var(--dim);font-weight:400;text-transform:none;letter-spacing:0}
+.finput,.fselect,.ftextarea{width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:inherit;font-size:.88rem;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--cyan)}
+.ftextarea{resize:none;height:76px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.upload-area{width:100%;min-height:110px;border-radius:12px;border:2px dashed var(--border);background:var(--bg3);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:14px;transition:border-color .2s}
+.upload-area:active{border-color:var(--cyan)}
+.upload-plus{font-size:1.3rem;font-weight:300;color:var(--muted)}
+.upload-text{font-size:.76rem;color:var(--muted);text-align:center}
+.upload-hint{font-size:.65rem;color:var(--dim)}
+.img-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:7px}
+.img-thumb{position:relative;border-radius:9px;overflow:hidden;aspect-ratio:1;background:var(--bg3)}
+.img-thumb img{width:100%;height:100%;object-fit:cover}
+.img-del{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.7);border:none;color:#fff;font-size:.65rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700}
+.img-main{position:absolute;bottom:3px;left:3px;background:var(--cyan);color:var(--bg);font-size:.5rem;font-weight:800;padding:1px 5px;border-radius:3px}
+.btn-row{display:flex;gap:7px;margin-top:7px}
+.seller-section{background:var(--bg3);border-radius:12px;padding:12px;border:1px solid var(--border);margin-bottom:11px}
+.seller-sec-label{font-size:.7rem;color:var(--cyan);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.submit-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--red),var(--red2));color:#fff;border:none;border-radius:13px;font-family:inherit;font-size:.95rem;font-weight:700;cursor:pointer;transition:opacity .2s;margin-top:8px}
+.submit-btn:active{opacity:.85}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* TOAST */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#0f2a0f;border:1px solid #2d6a2d;color:#5dba5d;padding:9px 20px;border-radius:11px;font-size:.82rem;font-weight:600;z-index:9999;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="s-logo">reArtistry</div>
+  <div class="s-sub">Art &bull; Books &bull; Culture</div>
+  <div class="s-bar"><div class="s-fill"></div></div>
+</div>
+
+<!-- SEARCH -->
+<div class="search-bar" id="searchBar">
+  <input class="s-input" id="searchInput" type="search" placeholder="Search..."/>
+  <button class="s-close" onclick="closeSearch()">X</button>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo">reArtistry</div>
+    <div class="top-right">
+      <div class="lang-wrap">
+        <button class="lb" id="lb-ar" onclick="setLang('ar')">AR</button>
+        <button class="lb on" id="lb-en" onclick="setLang('en')">EN</button>
+      </div>
+      <button class="icon-btn" onclick="openSearch()">S</button>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab on" id="tab-art" onclick="goTab('art')"><span id="tl-art">Artworks</span></button>
+    <button class="tab" id="tab-books" onclick="goTab('books')"><span id="tl-books">Books</span></button>
+    <button class="tab" id="tab-contact" onclick="goTab('contact')"><span id="tl-contact">Contact</span></button>
+  </div>
+
+  <div class="main">
+    <!-- ART PAGE -->
+    <div class="page on" id="page-art">
+      <div class="hero">
+        <div class="hero-bg"></div><div class="hero-grid"></div>
+        <div class="hero-body">
+          <div class="hero-tag" id="h-tag">New Arrivals</div>
+          <div>
+            <div class="hero-title" id="h-title">Discover <span>Authentic</span> Art</div>
+            <div class="hero-sub" id="h-sub">Exclusive paintings by world-renowned artists</div>
+          </div>
+        </div>
+      </div>
+      <div class="chips" id="art-chips">
+        <div class="chip on" onclick="filterArt('all',this)" id="ac-all">All</div>
+        <div class="chip" onclick="filterArt('abstract',this)" id="ac-abs">Abstract</div>
+        <div class="chip" onclick="filterArt('portrait',this)" id="ac-por">Portrait</div>
+        <div class="chip" onclick="filterArt('landscape',this)" id="ac-lan">Landscape</div>
+        <div class="chip" onclick="filterArt('calligraphy',this)" id="ac-cal">Calligraphy</div>
+      </div>
+      <div class="sec-head">
+        <div class="sec-title" id="s-art-title">Art <span>Gallery</span></div>
+        <div class="sec-count" id="art-count">0</div>
+      </div>
+      <div class="art-grid" id="art-grid"></div>
+    </div>
+
+    <!-- BOOKS PAGE -->
+    <div class="page" id="page-books">
+      <div class="hero" style="background:linear-gradient(135deg,#0a1a1e,#0a0a1a)">
+        <div class="hero-bg" style="background:radial-gradient(circle at 30% 50%,var(--cyang),transparent 60%)"></div>
+        <div class="hero-grid"></div>
+        <div class="hero-body">
+          <div class="hero-tag" style="background:rgba(0,200,215,.15);border-color:rgba(0,200,215,.3);color:var(--cyan)" id="bh-tag">Library</div>
+          <div>
+            <div class="hero-title" id="bh-title">A World of <span>Books</span></div>
+            <div class="hero-sub" id="bh-sub">Literature &bull; Art &bull; History &bull; Fiction</div>
+          </div>
+        </div>
+      </div>
+      <div class="chips" id="book-chips">
+        <div class="chip on" onclick="filterBooks('all',this)" id="bc-all">All</div>
+        <div class="chip" onclick="filterBooks('novel',this)" id="bc-nov">Novels</div>
+        <div class="chip" onclick="filterBooks('poetry',this)" id="bc-poe">Poetry</div>
+        <div class="chip" onclick="filterBooks('art',this)" id="bc-art">Art & Design</div>
+        <div class="chip" onclick="filterBooks('history',this)" id="bc-his">History</div>
+      </div>
+      <div class="sec-head">
+        <div class="sec-title" id="s-books-title">Available <span>Books</span></div>
+        <div class="sec-count" id="book-count">0</div>
+      </div>
+      <div class="books-list" id="books-list"></div>
+    </div>
+
+    <!-- CONTACT PAGE -->
+    <div class="page" id="page-contact">
+      <div class="contact-page">
+        <div class="cp-title">reArtistry</div>
+        <div class="cp-sub" id="cp-sub">Your destination for authentic art and curated books</div>
+        <div class="stats">
+          <div class="stat"><div class="stat-n" id="cp-s1">0</div><div class="stat-l" id="cp-sl1">Artworks</div></div>
+          <div class="stat"><div class="stat-n" id="cp-s2">0</div><div class="stat-l" id="cp-sl2">Books</div></div>
+          <div class="stat"><div class="stat-n">100%</div><div class="stat-l" id="cp-sl3">Original</div></div>
+        </div>
+        <div class="ccard">
+          <div class="citem" onclick="callPhone()">
+            <div class="cicon ci-r">T</div>
+            <div class="ctext"><div class="clabel" id="cp-phone-l">Phone</div><div class="cval" id="cp-phone-v">+966 557 734 815</div></div>
+            <div class="cchev">›</div>
+          </div>
+          <div class="citem" onclick="openWhatsApp()">
+            <div class="cicon ci-w">W</div>
+            <div class="ctext"><div class="clabel">WhatsApp</div><div class="cval" id="cp-wa-v">Chat on WhatsApp</div></div>
+            <div class="cchev">›</div>
+          </div>
+          <div class="citem" onclick="openInstagram()">
+            <div class="cicon ci-i">I</div>
+            <div class="ctext"><div class="clabel">Instagram</div><div class="cval">@reArtistry</div></div>
+            <div class="cchev">›</div>
+          </div>
+        </div>
+        <div class="pwa-box">
+          <div class="pwa-t" id="cp-pwa-t">Add to Home Screen</div>
+          <div class="pwa-d" id="cp-pwa-d">Safari → Share → "Add to Home Screen" — works like a native app!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="nav">
+    <button class="nb on" id="nb-art" onclick="goTab('art')">
+      <div class="nb-icon">A</div><div class="nb-label" id="nl-art">Art</div><div class="nb-dot"></div>
+    </button>
+    <button class="nb" id="nb-books" onclick="goTab('books')">
+      <div class="nb-icon">B</div><div class="nb-label" id="nl-books">Books</div><div class="nb-dot"></div>
+    </button>
+    <button class="nb" id="nb-contact" onclick="goTab('contact')">
+      <div class="nb-icon">C</div><div class="nb-label" id="nl-contact">Contact</div><div class="nb-dot"></div>
+    </button>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="openForm()">+</button>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal-bg" onclick="modalBgClick(event)">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-img-wrap">
+      <button class="modal-close" onclick="closeModal()">X</button>
+      <img id="modal-img" class="modal-img" src="" alt="" onclick="nextImg()"/>
+      <div class="modal-dots" id="modal-dots"></div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tags" id="modal-tags"></div>
+      <div class="modal-title" id="modal-title"></div>
+      <div class="modal-title2" id="modal-title2"></div>
+      <div class="modal-sub" id="modal-sub"></div>
+      <div class="modal-desc" id="modal-desc"></div>
+      <div class="modal-desc2" id="modal-desc2"></div>
+      <div class="specs" id="modal-specs"></div>
+      <div class="price-row">
+        <div><div class="price-label" id="modal-price-l">Price</div><div class="price-big" id="modal-price"></div></div>
+        <div id="modal-avail"></div>
+      </div>
+      <div id="modal-seller-btns"></div>
+      <button class="btn-main btn-red" id="modal-contact-btn" onclick="contactForItem()">Contact to Buy</button>
+      <button class="btn-main btn-cyan" id="modal-call-btn" onclick="callForItem()">Call Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT FORM -->
+<div class="form-bg" id="form-bg" onclick="formBgClick(event)">
+  <div class="form-sheet" id="form-sheet">
+    <div class="modal-handle"></div>
+    <div class="form-head">
+      <div class="form-title" id="form-title">Add New Item</div>
+      <button class="form-close" onclick="closeForm()">X</button>
+    </div>
+    <div class="form-body">
+      <div class="type-row">
+        <button class="type-btn on" id="tb-art" onclick="setType('art')">Artwork</button>
+        <button class="type-btn" id="tb-book" onclick="setType('book')">Book</button>
+      </div>
+
+      <!-- IMAGES -->
+      <div class="fgroup">
+        <label class="flabel">Photos <span>(up to 5)</span></label>
+        <div class="upload-area" id="upload-area" onclick="document.getElementById('img-file').click()"
+          ondragover="event.preventDefault();this.style.borderColor='var(--cyan)'"
+          ondragleave="this.style.borderColor='var(--border)'"
+          ondrop="dropImgs(event)">
+          <div class="upload-plus">+</div>
+          <div class="upload-text" id="upload-text">Tap to add photos</div>
+          <div class="upload-hint">JPG, PNG, HEIC</div>
+        </div>
+        <input type="file" id="img-file" accept="image/*,image/heic,image/heif" multiple style="display:none" onchange="addImgs(this.files)"/>
+        <input type="file" id="img-cam" accept="image/*" capture="environment" style="display:none" onchange="addImgs(this.files)"/>
+        <div class="btn-row">
+          <button onclick="document.getElementById('img-file').click()" style="flex:1;padding:8px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);font-family:inherit;font-size:.76rem;cursor:pointer" id="btn-gallery">Gallery</button>
+          <button onclick="document.getElementById('img-cam').click()" style="flex:1;padding:8px;border-radius:9px;border:1px solid var(--border);background:var(--bg3);color:var(--muted);font-family:inherit;font-size:.76rem;cursor:pointer" id="btn-camera">Camera</button>
+        </div>
+        <div class="img-grid" id="img-grid"></div>
+      </div>
+
+      <!-- ART FIELDS -->
+      <div id="art-fields">
+        <div class="fgroup"><label class="flabel">Title (Arabic) *</label><input class="finput" id="f-name" type="text" placeholder="اسم اللوحة"/></div>
+        <div class="fgroup"><label class="flabel">Title (English)</label><input class="finput" id="f-nameEn" type="text" placeholder="Artwork title"/></div>
+        <div class="fgroup"><label class="flabel">Artist *</label><input class="finput" id="f-artist" type="text" placeholder="Artist name"/></div>
+        <div class="frow">
+          <div class="fgroup"><label class="flabel">Category</label><select class="fselect" id="f-cat"><option value="abstract">Abstract</option><option value="portrait">Portrait</option><option value="landscape">Landscape</option><option value="calligraphy">Calligraphy</option></select></div>
+          <div class="fgroup"><label class="flabel">Price (SAR) *</label><input class="finput" id="f-price" type="number" placeholder="1500"/></div>
+        </div>
+        <div class="frow">
+          <div class="fgroup"><label class="flabel">Size</label><input class="finput" id="f-size" type="text" placeholder="80x100 cm"/></div>
+          <div class="fgroup"><label class="flabel">Medium</label><input class="finput" id="f-medium" type="text" placeholder="Oil on canvas"/></div>
+        </div>
+        <div class="fgroup"><label class="flabel">Description (Arabic) <span>(optional)</span></label><textarea class="ftextarea" id="f-desc" placeholder="وصف اللوحة..."></textarea></div>
+        <div class="fgroup"><label class="flabel">Description (English) <span>(optional)</span></label><textarea class="ftextarea" id="f-descEn" placeholder="Artwork description..."></textarea></div>
+      </div>
+
+      <!-- BOOK FIELDS -->
+      <div id="book-fields" style="display:none">
+        <div class="fgroup"><label class="flabel">Title (Arabic) *</label><input class="finput" id="f-btitle" type="text" placeholder="اسم الكتاب"/></div>
+        <div class="fgroup"><label class="flabel">Title (English)</label><input class="finput" id="f-btitleEn" type="text" placeholder="Book title"/></div>
+        <div class="fgroup"><label class="flabel">Author *</label><input class="finput" id="f-author" type="text" placeholder="Author name"/></div>
+        <div class="frow">
+          <div class="fgroup"><label class="flabel">Category</label><select class="fselect" id="f-bcat"><option value="novel">Novel</option><option value="poetry">Poetry</option><option value="art">Art & Design</option><option value="history">History</option></select></div>
+          <div class="fgroup"><label class="flabel">Price (SAR) *</label><input class="finput" id="f-bprice" type="number" placeholder="75"/></div>
+        </div>
+        <div class="frow">
+          <div class="fgroup"><label class="flabel">Pages</label><input class="finput" id="f-pages" type="text" placeholder="350 pages"/></div>
+          <div class="fgroup"><label class="flabel">Language</label><input class="finput" id="f-lang" type="text" placeholder="Arabic"/></div>
+        </div>
+        <div class="fgroup"><label class="flabel">Description (Arabic) <span>(optional)</span></label><textarea class="ftextarea" id="f-bdesc" placeholder="وصف الكتاب..."></textarea></div>
+        <div class="fgroup"><label class="flabel">Description (English) <span>(optional)</span></label><textarea class="ftextarea" id="f-bdescEn" placeholder="Book description..."></textarea></div>
+      </div>
+
+      <!-- SELLER CONTACT -->
+      <div class="seller-section">
+        <div class="seller-sec-label" id="seller-sec-l">Seller Contact</div>
+        <div class="fgroup"><label class="flabel">WhatsApp / Phone</label><input class="finput" id="f-phone" type="tel" placeholder="+966 5XX XXX XXXX"/></div>
+        <div class="fgroup" style="margin-bottom:0"><label class="flabel">Instagram <span>(optional)</span></label><input class="finput" id="f-insta" type="text" placeholder="@username"/></div>
+      </div>
+
+      <button class="submit-btn" id="submit-btn" onclick="submitForm()">Publish</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script type="module">
+// ============ FIREBASE ============
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const fbConfig = {
+  apiKey: "AIzaSyCCb3Fq5y9faFYFyrlBngsAdg978kFjQSM",
+  authDomain: "reartistry-adc5c.firebaseapp.com",
+  projectId: "reartistry-adc5c",
+  storageBucket: "reartistry-adc5c.firebasestorage.app",
+  messagingSenderId: "946121886281",
+  appId: "1:946121886281:web:929a71633b67db8e52cd98"
+};
+const fbApp = initializeApp(fbConfig);
+const db = getFirestore(fbApp);
+
+// ============ CONFIG ============
+const PHONE = '+966557734815';
+const WA = '966557734815';
+
+// ============ LANG ============
+const L = {
+  en: {
+    art:'Artworks', books:'Books', contact:'Contact',
+    htag:'New Arrivals', htitle:'Discover <span>Authentic</span> Art', hsub:'Exclusive paintings by world-renowned artists',
+    bhtag:'Library', bhtitle:'A World of <span>Books</span>', bhsub:'Literature \u2022 Art \u2022 History \u2022 Fiction',
+    acAll:'All', acAbs:'Abstract', acPor:'Portrait', acLan:'Landscape', acCal:'Calligraphy',
+    bcAll:'All', bcNov:'Novels', bcPoe:'Poetry', bcArt:'Art & Design', bcHis:'History',
+    sArt:'Art <span>Gallery</span>', sBooks:'Available <span>Books</span>',
+    cpSub:'Your destination for authentic art and curated books',
+    cpSl1:'Artworks', cpSl2:'Books', cpSl3:'Original',
+    cpPhoneL:'Phone', cpWaV:'Chat on WhatsApp',
+    cpPwaT:'Add to Home Screen', cpPwaD:'Safari \u2192 Share \u2192 "Add to Home Screen"',
+    modalPriceL:'Price', modalContact:'Contact to Buy', modalCall:'Call Now',
+    formTitle:'Add New Item', formEdit:'Edit Item',
+    tbArt:'Artwork', tbBook:'Book',
+    sellerL:'Seller Contact',
+    publish:'Publish', save:'Save Changes',
+    gallery:'Gallery', camera:'Camera',
+    uploadText:'Tap to add photos',
+    available:'Available', sold:'Sold', outOfStock:'Out of Stock',
+    added:'Added', featured:'Featured', newBadge:'New', rare:'Rare', classic:'Classic',
+    artType:'Artwork', bookType:'Book',
+    nlArt:'Art', nlBooks:'Books', nlContact:'Contact',
+    confirmDel:'Delete this item?',
+    toastPublished:'Published!', toastSaved:'Saved!', toastDeleted:'Deleted', toastLoading:'Loading photos...',
+    toastAdded:'Photos added!', toastFull:'Fill required fields *', toastStorageFull:'Storage full',
+    contactBtn:'Contact', orderBtn:'Order',
+  },
+  ar: {
+    art:'\u0627\u0644\u0644\u0648\u062d\u0627\u062a', books:'\u0627\u0644\u0643\u062a\u0628', contact:'\u062a\u0648\u0627\u0635\u0644',
+    htag:'\u0623\u062d\u062f\u062b \u0627\u0644\u0623\u0639\u0645\u0627\u0644', htitle:'\u0627\u0643\u062a\u0634\u0641 <span>\u0627\u0644\u0641\u0646</span> \u0627\u0644\u0623\u0635\u064a\u0644', hsub:'\u0644\u0648\u062d\u0627\u062a \u062d\u0635\u0631\u064a\u0629 \u0644\u0641\u0646\u0627\u0646\u064a\u0646 \u0639\u0627\u0644\u0645\u064a\u064a\u0646',
+    bhtag:'\u0627\u0644\u0645\u0643\u062a\u0628\u0629', bhtitle:'\u0639\u0627\u0644\u0645 \u0645\u0646 <span>\u0627\u0644\u0643\u062a\u0628</span>', bhsub:'\u0623\u062f\u0628 \u2022 \u0641\u0646 \u2022 \u062a\u0627\u0631\u064a\u062e \u2022 \u0631\u0648\u0627\u064a\u0627\u062a',
+    acAll:'\u0627\u0644\u0643\u0644', acAbs:'\u062a\u062c\u0631\u064a\u062f\u064a', acPor:'\u0628\u0648\u0631\u062a\u0631\u064a\u0647', acLan:'\u0645\u0646\u0627\u0638\u0631', acCal:'\u062e\u0637 \u0639\u0631\u0628\u064a',
+    bcAll:'\u0627\u0644\u0643\u0644', bcNov:'\u0631\u0648\u0627\u064a\u0627\u062a', bcPoe:'\u0634\u0639\u0631', bcArt:'\u0641\u0646 \u0648\u062a\u0635\u0645\u064a\u0645', bcHis:'\u062a\u0627\u0631\u064a\u062e',
+    sArt:'\u0645\u0639\u0631\u0636 <span>\u0627\u0644\u0644\u0648\u062d\u0627\u062a</span>', sBooks:'\u0627\u0644\u0643\u062a\u0628 <span>\u0627\u0644\u0645\u062a\u0648\u0641\u0631\u0629</span>',
+    cpSub:'\u0648\u062c\u0647\u062a\u0643 \u0644\u0644\u0641\u0646 \u0627\u0644\u0623\u0635\u064a\u0644 \u0648\u0627\u0644\u0643\u062a\u0628 \u0627\u0644\u0645\u0645\u064a\u0632\u0629',
+    cpSl1:'\u0644\u0648\u062d\u0629 \u0641\u0646\u064a\u0629', cpSl2:'\u0643\u062a\u0627\u0628', cpSl3:'\u0623\u0635\u0644\u064a\u0629',
+    cpPhoneL:'\u0627\u0644\u0647\u0627\u062a\u0641', cpWaV:'\u062a\u0648\u0627\u0635\u0644 \u0639\u0628\u0631 \u0648\u0627\u062a\u0633\u0627\u0628',
+    cpPwaT:'\u0623\u0636\u0641 \u0644\u0644\u0634\u0627\u0634\u0629 \u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629', cpPwaD:'Safari \u2190 \u0632\u0631 \u0627\u0644\u0645\u0634\u0627\u0631\u0643\u0629 \u2190 \u0625\u0636\u0627\u0641\u0629',
+    modalPriceL:'\u0627\u0644\u0633\u0639\u0631', modalContact:'\u062a\u0648\u0627\u0635\u0644 \u0644\u0644\u0634\u0631\u0627\u0621', modalCall:'\u0627\u062a\u0635\u0644 \u0627\u0644\u0622\u0646',
+    formTitle:'\u0625\u0636\u0627\u0641\u0629 \u062c\u062f\u064a\u062f', formEdit:'\u062a\u0639\u062f\u064a\u0644 \u0627\u0644\u0645\u0646\u0634\u0648\u0631',
+    tbArt:'\u0644\u0648\u062d\u0629 \u0641\u0646\u064a\u0629', tbBook:'\u0643\u062a\u0627\u0628',
+    sellerL:'\u0628\u064a\u0627\u0646\u0627\u062a \u0627\u0644\u0628\u0627\u0626\u0639',
+    publish:'\u0646\u0634\u0631', save:'\u062d\u0641\u0638 \u0627\u0644\u062a\u0639\u062f\u064a\u0644\u0627\u062a',
+    gallery:'\u0627\u0644\u0645\u0639\u0631\u0636', camera:'\u0627\u0644\u0643\u0627\u0645\u064a\u0631\u0627',
+    uploadText:'\u0627\u0636\u063a\u0637 \u0644\u0625\u0636\u0627\u0641\u0629 \u0635\u0648\u0631',
+    available:'\u0645\u062a\u0648\u0641\u0631', sold:'\u0645\u0628\u0627\u0639', outOfStock:'\u0646\u0641\u062f',
+    added:'\u0645\u0636\u0627\u0641', featured:'\u0645\u0645\u064a\u0632', newBadge:'\u062c\u062f\u064a\u062f', rare:'\u0646\u0627\u062f\u0631', classic:'\u0643\u0644\u0627\u0633\u064a\u0643',
+    artType:'\u0644\u0648\u062d\u0629 \u0641\u0646\u064a\u0629', bookType:'\u0643\u062a\u0627\u0628',
+    nlArt:'\u0627\u0644\u0641\u0646', nlBooks:'\u0627\u0644\u0643\u062a\u0628', nlContact:'\u062a\u0648\u0627\u0635\u0644',
+    confirmDel:'\u0647\u0644 \u062a\u0631\u064a\u062f \u062d\u0630\u0641 \u0647\u0630\u0627 \u0627\u0644\u0645\u0646\u0634\u0648\u0631\u061f',
+    toastPublished:'\u062a\u0645 \u0627\u0644\u0646\u0634\u0631!', toastSaved:'\u062a\u0645 \u0627\u0644\u062d\u0641\u0638!', toastDeleted:'\u062a\u0645 \u0627\u0644\u062d\u0630\u0641', toastLoading:'\u062c\u0627\u0631\u064a \u062a\u062d\u0645\u064a\u0644 \u0627\u0644\u0635\u0648\u0631...',
+    toastAdded:'\u062a\u0645 \u0625\u0636\u0627\u0641\u0629 \u0627\u0644\u0635\u0648\u0631!', toastFull:'\u064a\u0631\u062c\u0649 \u062a\u0639\u0628\u0626\u0629 \u0627\u0644\u062d\u0642\u0648\u0644 \u0627\u0644\u0645\u0637\u0644\u0648\u0628\u0629 *', toastStorageFull:'\u0645\u0633\u0627\u062d\u0629 \u0627\u0644\u062a\u062e\u0632\u064a\u0646 \u0645\u0645\u062a\u0644\u0626\u0629',
+    contactBtn:'\u062a\u0648\u0627\u0635\u0644', orderBtn:'\u0627\u0637\u0644\u0628',
+  }
+};
+let lang = 'en';
+
+function setLang(l) {
+  lang = l;
+  document.getElementById('lb-ar').classList.toggle('on', l==='ar');
+  document.getElementById('lb-en').classList.toggle('on', l==='en');
+  document.body.classList.toggle('ar', l==='ar');
+  document.documentElement.setAttribute('dir', l==='ar'?'rtl':'ltr');
+  applyLang();
+  renderArt(); renderBooks();
+}
+
+function t(k) { return L[lang][k] || L.en[k] || k; }
+
+function applyLang() {
+  const m = {
+    'tl-art':'art','tl-books':'books','tl-contact':'contact',
+    'h-tag':'htag','h-sub':'hsub',
+    'bh-tag':'bhtag','bh-sub':'bhsub',
+    'ac-all':'acAll','ac-abs':'acAbs','ac-por':'acPor','ac-lan':'acLan','ac-cal':'acCal',
+    'bc-all':'bcAll','bc-nov':'bcNov','bc-poe':'bcPoe','bc-art':'bcArt','bc-his':'bcHis',
+    'cp-sub':'cpSub','cp-sl1':'cpSl1','cp-sl2':'cpSl2','cp-sl3':'cpSl3',
+    'cp-phone-l':'cpPhoneL','cp-wa-v':'cpWaV','cp-pwa-t':'cpPwaT','cp-pwa-d':'cpPwaD',
+    'modal-price-l':'modalPriceL',
+    'modal-contact-btn':'modalContact','modal-call-btn':'modalCall',
+    'tb-art':'tbArt','tb-book':'tbBook','seller-sec-l':'sellerL',
+    'btn-gallery':'gallery','btn-camera':'camera','upload-text':'uploadText',
+    'nl-art':'nlArt','nl-books':'nlBooks','nl-contact':'nlContact',
+  };
+  for (const [id, key] of Object.entries(m)) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = t(key);
+  }
+  document.getElementById('h-title').innerHTML = t('htitle');
+  document.getElementById('bh-title').innerHTML = t('bhtitle');
+  document.getElementById('s-art-title').innerHTML = t('sArt');
+  document.getElementById('s-books-title').innerHTML = t('sBooks');
+  document.getElementById('submit-btn').textContent = editingId !== null ? t('save') : t('publish');
+  document.getElementById('form-title').textContent = editingId !== null ? t('formEdit') : t('formTitle');
+}
+
+// ============ DATA ============
+let arts = [], books = [], nextId = 100;
+let editingId = null, editingType = null;
+let imgs = [];
+let modalImgs = [], modalIdx = 0;
+let curItem = null, curItemType = null;
+let artFilter = 'all', bookFilter = 'all';
+let addType = 'art';
+
+// ============ STORAGE (Firebase) ============
+function save() {} // handled per-action
+
+function load() {
+  // Listen realtime — updates all devices instantly
+  onSnapshot(collection(db, 'artworks'), snap => {
+    arts = snap.docs.map(d => ({...d.data(), fid: d.id, u: true}));
+    renderArt();
+    document.getElementById('cp-s1').textContent = arts.length;
+  });
+  onSnapshot(collection(db, 'books'), snap => {
+    books = snap.docs.map(d => ({...d.data(), fid: d.id, u: true}));
+    renderBooks();
+    document.getElementById('cp-s2').textContent = books.length;
+  });
+}
+
+// ============ RENDER ART ============
+function renderArt() {
+  const grid = document.getElementById('art-grid');
+  const filtered = artFilter==='all' ? arts : arts.filter(a=>a.cat===artFilter);
+  document.getElementById('art-count').textContent = filtered.length;
+  document.getElementById('cp-s1').textContent = arts.length;
+  grid.innerHTML = '';
+  filtered.forEach((art, i) => {
+    const card = document.createElement('div');
+    const feat = art.feat && artFilter==='all' && i===0;
+    card.className = 'art-card' + (feat?' feat':'');
+    card.onclick = () => openModal(art, 'art');
+
+    const mainName = lang==='ar' ? art.name : (art.nameEn||art.name);
+    const secName = lang==='ar' ? art.nameEn : art.name;
+    const bLabel = art.badge ? getBadge(art.badge) : '';
+    const bClass = art.badge==='new'?'new':art.badge==='sold'?'sold':'';
+    const priceEl = art.available
+      ? `<span class="art-price">SAR ${(art.price||0).toLocaleString()}</span>`
+      : `<span class="art-price sold">SAR ${(art.price||0).toLocaleString()}</span>`;
+    const contactEl = art.available
+      ? `<button class="mini-btn" onclick="event.stopPropagation();quickContact('${mainName.replace(/'/g,"\\'")}',${JSON.stringify(art.phone||'')})">${t('contactBtn')}</button>`
+      : `<span style="font-size:.65rem;color:var(--dim)">${t('sold')}</span>`;
+    const userEl = art.u ? `<span class="ubadge">${t('added')}</span>` : '';
+    const actEl = art.u ? `<div class="card-actions">
+      <button class="ca-btn ca-del" onclick="event.stopPropagation();delItem('art',${art.id})">x</button>
+      <button class="ca-btn ca-edit" onclick="event.stopPropagation();editItem('art',${art.id})">E</button>
+    </div>` : '';
+
+    card.innerHTML = `
+      <div class="art-img-wrap">
+        ${art.img ? `<img class="art-img" src="${art.img}" alt="${mainName}" loading="lazy" onerror="this.style.background='var(--bg3)'"/>` : '<div style="width:100%;height:100%;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:.75rem;">No image</div>'}
+        ${bLabel ? `<div class="abadge ${bClass}">${bLabel}</div>` : ''}
+        ${actEl}
+      </div>
+      <div class="art-info">
+        <div class="art-name">${userEl}${mainName}</div>
+        ${secName ? `<div class="art-name2">${secName}</div>` : ''}
+        <div class="art-artist">${art.artist||''}</div>
+        <div class="art-foot">${priceEl}${contactEl}</div>
+      </div>`;
+    grid.appendChild(card);
+  });
+}
+
+// ============ RENDER BOOKS ============
+function renderBooks() {
+  const list = document.getElementById('books-list');
+  const filtered = bookFilter==='all' ? books : books.filter(b=>b.cat===bookFilter);
+  document.getElementById('book-count').textContent = filtered.length;
+  document.getElementById('cp-s2').textContent = books.length;
+  list.innerHTML = '';
+  filtered.forEach(book => {
+    const card = document.createElement('div');
+    card.className = 'book-card';
+    card.onclick = () => openModal(book, 'book');
+
+    const mainTitle = lang==='ar' ? book.title : (book.titleEn||book.title);
+    const secTitle = lang==='ar' ? book.titleEn : book.title;
+    const mainDesc = lang==='ar' ? book.desc : (book.descEn||book.desc);
+    const stars = '★'.repeat(book.stars||5)+'☆'.repeat(5-(book.stars||5));
+    const bLabel = book.badge ? getBadge(book.badge) : '';
+    const contactEl = book.available
+      ? `<button class="mini-btn" onclick="event.stopPropagation();quickContact('${mainTitle.replace(/'/g,"\\'")}',${JSON.stringify(book.phone||'')})">${t('orderBtn')}</button>`
+      : `<span style="font-size:.65rem;color:var(--dim)">${t('outOfStock')}</span>`;
+    const userEl = book.u ? `<span class="ubadge">${t('added')}</span>` : '';
+    const actEl = book.u ? `<div class="book-actions">
+      <button class="ca-btn ca-del" onclick="event.stopPropagation();delItem('book',${book.id})">x</button>
+      <button class="ca-btn ca-edit" onclick="event.stopPropagation();editItem('book',${book.id})">E</button>
+    </div>` : '';
+
+    card.innerHTML = `
+      <div class="book-cover-wrap">
+        ${book.img ? `<img class="book-cover" src="${book.img}" alt="${mainTitle}" loading="lazy" onerror="this.style.background='var(--bg3)'"/>` : '<div style="width:100%;height:100%;min-height:125px;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--dim);font-size:.7rem;">No image</div>'}
+        ${bLabel ? `<div class="bbadge">${bLabel}</div>` : ''}
+        ${actEl}
+      </div>
+      <div class="book-info">
+        <div>
+          <div class="book-title">${userEl}${mainTitle}</div>
+          ${secTitle ? `<div class="book-title2">${secTitle}</div>` : ''}
+          <div class="book-author">${book.author||''}</div>
+          ${mainDesc ? `<div class="book-desc">${mainDesc}</div>` : ''}
+        </div>
+        <div class="book-foot">
+          <div><div class="book-price">SAR ${book.price||0}</div><div class="stars">${stars}</div></div>
+          ${contactEl}
+        </div>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+function getBadge(b) {
+  const m = {new:t('newBadge'),sold:t('sold'),featured:t('featured'),rare:t('rare'),classic:t('classic')};
+  return m[b]||b;
+}
+
+// ============ MODAL ============
+function openModal(item, type) {
+  curItem = item; curItemType = type;
+  const isArt = type==='art';
+  modalImgs = (item.imgs && item.imgs.length) ? item.imgs : (item.img ? [item.img] : []);
+  modalIdx = 0;
+
+  const mainTitle = isArt ? (lang==='ar'?item.name:(item.nameEn||item.name)) : (lang==='ar'?item.title:(item.titleEn||item.title));
+  const secTitle = isArt ? (lang==='ar'?item.nameEn:item.name) : (lang==='ar'?item.titleEn:item.title);
+  const mainDesc = lang==='ar' ? item.desc : (item.descEn||item.desc);
+  const secDesc = lang==='ar' ? item.descEn : item.desc;
+
+  document.getElementById('modal-img').src = modalImgs[0]||'';
+  document.getElementById('modal-title').textContent = mainTitle||'';
+  document.getElementById('modal-title2').textContent = secTitle||'';
+  document.getElementById('modal-sub').textContent = isArt ? (item.artist||'') : (item.author||'');
+  document.getElementById('modal-desc').textContent = mainDesc||'';
+  document.getElementById('modal-desc2').textContent = secDesc||'';
+  document.getElementById('modal-price').textContent = `SAR ${(item.price||0).toLocaleString()}`;
+  document.getElementById('modal-price-l').textContent = t('modalPriceL');
+
+  const tags = document.getElementById('modal-tags');
+  tags.innerHTML = `<span class="mtag type">${isArt?t('artType'):t('bookType')}</span>`;
+  if (item.u) tags.innerHTML += `<span class="mtag cat">${t('added')}</span>`;
+
+  const specs = document.getElementById('modal-specs');
+  if (isArt) {
+    specs.innerHTML = `
+      <div class="spec"><div class="spec-label">Size</div><div class="spec-val">${item.size||'—'}</div></div>
+      <div class="spec"><div class="spec-label">Medium</div><div class="spec-val">${item.medium||'—'}</div></div>
+      <div class="spec"><div class="spec-label">Year</div><div class="spec-val">${item.year||'—'}</div></div>
+      <div class="spec"><div class="spec-label">Status</div><div class="spec-val">${item.available?t('available'):t('sold')}</div></div>`;
+  } else {
+    specs.innerHTML = `
+      <div class="spec"><div class="spec-label">Pages</div><div class="spec-val">${item.pages||'—'}</div></div>
+      <div class="spec"><div class="spec-label">Language</div><div class="spec-val">${item.lang||'—'}</div></div>
+      <div class="spec"><div class="spec-label">Edition</div><div class="spec-val">${item.edition||'—'}</div></div>
+      <div class="spec"><div class="spec-label">Status</div><div class="spec-val">${item.available?t('available'):t('outOfStock')}</div></div>`;
+  }
+
+  document.getElementById('modal-avail').innerHTML = item.available
+    ? `<span style="color:var(--cyan);font-size:.78rem;font-weight:700">${t('available')} ✓</span>`
+    : `<span style="color:var(--dim);font-size:.78rem">${isArt?t('sold'):t('outOfStock')}</span>`;
+
+  // Seller contact buttons
+  const sellerDiv = document.getElementById('modal-seller-btns');
+  const ctBtn = document.getElementById('modal-contact-btn');
+  const callBtn = document.getElementById('modal-call-btn');
+  if (item.phone || item.insta) {
+    sellerDiv.innerHTML = '';
+    if (item.phone) {
+      const clean = item.phone.replace(/[^0-9]/g,'');
+      const name = encodeURIComponent(`Hello, interested in: ${mainTitle}`);
+      sellerDiv.innerHTML += `<button class="btn-main btn-green" onclick="window.open('https://wa.me/${clean}?text=${name}','_blank')">WhatsApp Seller</button>`;
+      sellerDiv.innerHTML += `<button class="btn-main btn-cyan" onclick="window.location.href='tel:${item.phone}'" style="margin-bottom:8px">Call ${item.phone}</button>`;
+    }
+    if (item.insta) {
+      const h = item.insta.replace('@','');
+      sellerDiv.innerHTML += `<button class="btn-main btn-insta" style="margin-bottom:8px" onclick="window.open('https://instagram.com/${h}','_blank')">Instagram: ${item.insta}</button>`;
+    }
+    ctBtn.style.display='none'; callBtn.style.display='none';
+  } else {
+    sellerDiv.innerHTML='';
+    ctBtn.style.display='flex'; callBtn.style.display='flex';
+    ctBtn.textContent = t('modalContact');
+    callBtn.textContent = t('modalCall');
+  }
+
+  renderModalDots();
+  document.getElementById('modal-bg').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+
+function renderModalDots() {
+  const dots = document.getElementById('modal-dots');
+  if (modalImgs.length<=1) { dots.innerHTML=''; return; }
+  dots.innerHTML = modalImgs.map((_,i)=>
+    `<div onclick="modalImgs&&(modalIdx=${i},document.getElementById('modal-img').src=modalImgs[${i}],renderModalDots())" style="width:${i===modalIdx?'16':'6'}px;height:6px;border-radius:3px;background:${i===modalIdx?'var(--cyan)':'rgba(255,255,255,.4)'};cursor:pointer;transition:all .2s"></div>`
+  ).join('');
+}
+
+function nextImg() {
+  if (modalImgs.length<=1) return;
+  modalIdx = (modalIdx+1)%modalImgs.length;
+  document.getElementById('modal-img').src = modalImgs[modalIdx];
+  renderModalDots();
+}
+
+function closeModal() {
+  document.getElementById('modal-bg').classList.remove('on');
+  document.body.style.overflow='';
+}
+function modalBgClick(e) { if(e.target===document.getElementById('modal-bg')) closeModal(); }
+function contactForItem() {
+  if (!curItem) return;
+  const name = curItemType==='art' ? (curItem.nameEn||curItem.name) : (curItem.titleEn||curItem.title);
+  window.open(`https://wa.me/${WA}?text=${encodeURIComponent('Hello, interested in: '+name)}`, '_blank');
+}
+function callForItem() { if(curItem) window.location.href=`tel:${PHONE}`; }
+
+// ============ TABS ============
+function goTab(tab) {
+  ['art','books','contact'].forEach(t=>{
+    document.getElementById('page-'+t).classList.toggle('on',t===tab);
+    document.getElementById('tab-'+t).classList.toggle('on',t===tab);
+    document.getElementById('nb-'+t).classList.toggle('on',t===tab);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ============ FILTERS ============
+function filterArt(cat, el) {
+  artFilter = cat;
+  document.querySelectorAll('#art-chips .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderArt();
+}
+function filterBooks(cat, el) {
+  bookFilter = cat;
+  document.querySelectorAll('#book-chips .chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  renderBooks();
+}
+
+// ============ FORM ============
+function openForm() {
+  editingId=null; editingType=null; imgs=[];
+  setType('art');
+  document.getElementById('form-title').textContent = t('formTitle');
+  document.getElementById('submit-btn').textContent = t('publish');
+  resetFields();
+  document.getElementById('form-bg').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+
+function closeForm() {
+  document.getElementById('form-bg').classList.remove('on');
+  document.body.style.overflow='';
+  editingId=null; editingType=null; imgs=[];
+  resetFields();
+}
+function formBgClick(e) { if(e.target===document.getElementById('form-bg')) closeForm(); }
+
+function setType(type) {
+  addType = type;
+  document.getElementById('tb-art').classList.toggle('on', type==='art');
+  document.getElementById('tb-book').classList.toggle('on', type==='book');
+  document.getElementById('art-fields').style.display = type==='art'?'block':'none';
+  document.getElementById('book-fields').style.display = type==='book'?'block':'none';
+}
+
+function resetFields() {
+  ['f-name','f-nameEn','f-artist','f-size','f-medium','f-desc','f-descEn','f-price',
+   'f-btitle','f-btitleEn','f-author','f-pages','f-lang','f-bdesc','f-bdescEn','f-bprice',
+   'f-phone','f-insta'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  imgs=[];
+  renderImgGrid();
+  const ua=document.getElementById('upload-area');
+  if(ua) ua.style.display='flex';
+}
+
+function editItem(type, id) {
+  const item = type==='art' ? arts.find(a=>a.id===id) : books.find(b=>b.id===id);
+  if(!item) return;
+  editingId=id; editingType=type;
+  imgs = item.imgs ? [...item.imgs] : [];
+  setType(type);
+  document.getElementById('form-title').textContent = t('formEdit');
+  document.getElementById('submit-btn').textContent = t('save');
+  if (type==='art') {
+    document.getElementById('f-name').value=item.name||'';
+    document.getElementById('f-nameEn').value=item.nameEn||'';
+    document.getElementById('f-artist').value=item.artist||'';
+    document.getElementById('f-price').value=item.price||'';
+    document.getElementById('f-cat').value=item.cat||'abstract';
+    document.getElementById('f-size').value=item.size||'';
+    document.getElementById('f-medium').value=item.medium||'';
+    document.getElementById('f-desc').value=item.desc||'';
+    document.getElementById('f-descEn').value=item.descEn||'';
+  } else {
+    document.getElementById('f-btitle').value=item.title||'';
+    document.getElementById('f-btitleEn').value=item.titleEn||'';
+    document.getElementById('f-author').value=item.author||'';
+    document.getElementById('f-bprice').value=item.price||'';
+    document.getElementById('f-bcat').value=item.cat||'novel';
+    document.getElementById('f-pages').value=item.pages||'';
+    document.getElementById('f-lang').value=item.lang||'';
+    document.getElementById('f-bdesc').value=item.desc||'';
+    document.getElementById('f-bdescEn').value=item.descEn||'';
+  }
+  document.getElementById('f-phone').value=item.phone||'';
+  document.getElementById('f-insta').value=item.insta||'';
+  renderImgGrid();
+  document.getElementById('form-bg').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+
+function delItem(type, id) {
+  if (!confirm(t('confirmDel'))) return;
+  const arr = type==='art' ? arts : books;
+  const item = arr.find(x=>x.id===id);
+  if (!item || !item.fid) return;
+  const colName = type==='art' ? 'artworks' : 'books';
+  deleteDoc(doc(db, colName, item.fid))
+    .then(()=>toast(t('toastDeleted')))
+    .catch(()=>toast('Delete failed'));
+}
+
+function submitForm() {
+  const phone = document.getElementById('f-phone').value.trim();
+  const insta = document.getElementById('f-insta').value.trim();
+  const mainImg = imgs[0]||'';
+
+  if (editingId !== null) {
+    const arr = editingType==='art' ? arts : books;
+    const idx = arr.findIndex(x=>x.id===editingId);
+    if (idx!==-1) {
+      const newImgs = imgs.length ? [...imgs] : (arr[idx].imgs||[]);
+      const newImg = newImgs[0]||arr[idx].img||'';
+      if (editingType==='art') {
+        const name=document.getElementById('f-name').value.trim();
+        const artist=document.getElementById('f-artist').value.trim();
+        const price=parseInt(document.getElementById('f-price').value);
+        if(!name||!artist||!price){toast(t('toastFull'));return;}
+        arr[idx]={...arr[idx],name,nameEn:document.getElementById('f-nameEn').value.trim(),artist,
+          cat:document.getElementById('f-cat').value,price,
+          size:document.getElementById('f-size').value.trim()||'—',
+          medium:document.getElementById('f-medium').value.trim()||'—',
+          desc:document.getElementById('f-desc').value.trim(),
+          descEn:document.getElementById('f-descEn').value.trim(),
+          phone,insta,img:newImg,imgs:newImgs};
+      } else {
+        const title=document.getElementById('f-btitle').value.trim();
+        const author=document.getElementById('f-author').value.trim();
+        const price=parseInt(document.getElementById('f-bprice').value);
+        if(!title||!author||!price){toast(t('toastFull'));return;}
+        arr[idx]={...arr[idx],title,titleEn:document.getElementById('f-btitleEn').value.trim(),author,
+          cat:document.getElementById('f-bcat').value,price,
+          pages:document.getElementById('f-pages').value.trim()||'—',
+          lang:document.getElementById('f-lang').value.trim()||'Arabic',
+          desc:document.getElementById('f-bdesc').value.trim(),
+          descEn:document.getElementById('f-bdescEn').value.trim(),
+          phone,insta,img:newImg,imgs:newImgs};
+      }
+    }
+    const arr = editingType==='art' ? arts : books;
+    const item = arr.find(x=>x.id===editingId);
+    if (item && item.fid) {
+      const colName = editingType==='art' ? 'artworks' : 'books';
+      const {fid, u, ...data} = arr[arr.findIndex(x=>x.id===editingId)];
+      updateDoc(doc(db, colName, item.fid), data)
+        .then(()=>toast(t('toastSaved')))
+        .catch(()=>toast('Save failed'));
+    }
+    closeForm();
+    return;
+  }
+
+  if (addType==='art') {
+    const name=document.getElementById('f-name').value.trim();
+    const artist=document.getElementById('f-artist').value.trim();
+    const price=parseInt(document.getElementById('f-price').value);
+    if(!name||!artist||!price){toast(t('toastFull'));return;}
+    arts.push({id:nextId++,feat:false,name,nameEn:document.getElementById('f-nameEn').value.trim(),
+      artist,cat:document.getElementById('f-cat').value,price,badge:'new',
+      img:mainImg,imgs:[...imgs],
+      size:document.getElementById('f-size').value.trim()||'—',
+      medium:document.getElementById('f-medium').value.trim()||'—',
+      desc:document.getElementById('f-desc').value.trim(),
+      descEn:document.getElementById('f-descEn').value.trim(),
+      phone,insta,year:String(new Date().getFullYear()),available:true,u:true});
+  } else {
+    const title=document.getElementById('f-btitle').value.trim();
+    const author=document.getElementById('f-author').value.trim();
+    const price=parseInt(document.getElementById('f-bprice').value);
+    if(!title||!author||!price){toast(t('toastFull'));return;}
+    books.push({id:nextId++,title,titleEn:document.getElementById('f-btitleEn').value.trim(),
+      author,cat:document.getElementById('f-bcat').value,price,badge:'new',stars:5,
+      img:mainImg,imgs:[...imgs],
+      pages:document.getElementById('f-pages').value.trim()||'—',
+      lang:document.getElementById('f-lang').value.trim()||'Arabic',
+      desc:document.getElementById('f-bdesc').value.trim(),
+      descEn:document.getElementById('f-bdescEn').value.trim(),
+      phone,insta,edition:'1st Edition',available:true,u:true});
+  }
+  const colName = addType==='art' ? 'artworks' : 'books';
+  const newItem = addType==='art' ? arts[arts.length-1] : books[books.length-1];
+  const {fid, u, ...data} = newItem;
+  addDoc(collection(db, colName), data)
+    .then(()=>{ toast(t('toastPublished')); goTab(addType==='art'?'art':'books'); })
+    .catch(()=>toast('Publish failed'));
+  closeForm();
+}
+
+// ============ IMAGES ============
+function addImgs(files) {
+  const rem = 5-imgs.length;
+  const n = Math.min(files.length, rem);
+  if (n<=0) { toast('Max 5 photos'); return; }
+  toast(t('toastLoading'));
+  let done=0;
+  Array.from(files).slice(0,n).forEach(file=>{
+    try {
+      const url = URL.createObjectURL(file);
+      const image = new Image();
+      image.onload = () => {
+        try {
+          const c=document.createElement('canvas');
+          const MAX=1000;
+          let w=image.width,h=image.height;
+          if(w>h&&w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+          else if(h>MAX){w=Math.round(w*MAX/h);h=MAX;}
+          c.width=w;c.height=h;
+          c.getContext('2d').drawImage(image,0,0,w,h);
+          URL.revokeObjectURL(url);
+          imgs.push(c.toDataURL('image/jpeg',.8));
+        } catch(e) { imgs.push(url); }
+        done++;renderImgGrid();
+        if(done===n) toast(t('toastAdded'));
+      };
+      image.onerror=()=>{imgs.push(url);done++;renderImgGrid();};
+      image.src=url;
+    } catch(e) {
+      const r=new FileReader();
+      r.onload=ev=>{imgs.push(ev.target.result);done++;renderImgGrid();};
+      r.onerror=()=>done++;
+      r.readAsDataURL(file);
+    }
+  });
+  document.getElementById('img-file').value='';
+  document.getElementById('img-cam').value='';
+}
+
+function dropImgs(e) {
+  e.preventDefault();
+  document.getElementById('upload-area').style.borderColor='var(--border)';
+  addImgs(e.dataTransfer.files);
+}
+
+function removeImg(i) { imgs.splice(i,1); renderImgGrid(); }
+
+function renderImgGrid() {
+  const grid=document.getElementById('img-grid');
+  const area=document.getElementById('upload-area');
+  grid.innerHTML='';
+  imgs.forEach((src,i)=>{
+    const d=document.createElement('div');
+    d.className='img-thumb';
+    d.innerHTML=`<img src="${src}"/>`+
+      `<button class="img-del" onclick="removeImg(${i})">x</button>`+
+      (i===0?'<div class="img-main">MAIN</div>':'');
+    grid.appendChild(d);
+  });
+  if(area) area.style.display=imgs.length>=5?'none':'flex';
+}
+
+// ============ CONTACT ============
+function quickContact(name, phone) {
+  const p = phone || WA;
+  const clean = p.replace(/[^0-9]/g,'');
+  const num = clean.length>8 ? clean : WA;
+  window.open(`https://wa.me/${num}?text=${encodeURIComponent('Hello, interested in: '+name)}`, '_blank');
+}
+function callPhone() { window.location.href=`tel:${PHONE}`; }
+function openWhatsApp() { window.open(`https://wa.me/${WA}?text=${encodeURIComponent('Hello, I would like to inquire')}`, '_blank'); }
+function openInstagram() { window.open('https://instagram.com/reArtistry','_blank'); }
+
+// ============ SEARCH ============
+function openSearch() {
+  document.getElementById('searchBar').classList.add('on');
+  document.getElementById('searchInput').focus();
+}
+function closeSearch() { document.getElementById('searchBar').classList.remove('on'); }
+document.getElementById('searchInput').addEventListener('input', function() {
+  const q=this.value.trim().toLowerCase();
+  if(!q) return;
+  const am=arts.find(a=>(a.name||'').toLowerCase().includes(q)||(a.nameEn||'').toLowerCase().includes(q)||(a.artist||'').toLowerCase().includes(q));
+  const bm=books.find(b=>(b.title||'').toLowerCase().includes(q)||(b.titleEn||'').toLowerCase().includes(q)||(b.author||'').toLowerCase().includes(q));
+  if(am){closeSearch();goTab('art');setTimeout(()=>openModal(am,'art'),300);}
+  else if(bm){closeSearch();goTab('books');setTimeout(()=>openModal(bm,'book'),300);}
+});
+
+// ============ TOAST ============
+function toast(msg) {
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('on');
+  setTimeout(()=>el.classList.remove('on'),2500);
+}
+
+// ============ INIT ============
+applyLang();
+load(); // onSnapshot will call renderArt() and renderBooks()
+
+setTimeout(()=>{
+  document.getElementById('splash').classList.add('out');
+  setTimeout(()=>{
+    document.getElementById('splash').style.display='none';
+    document.getElementById('app').classList.add('on');
+  },500);
+},1500);
+</script>
+</body>
+</html>
